@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Media Gallery</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1> @_ka.re.ne 😘</h1>
+  </header>
+  
+  <main>
+    <section class="user-info">
+      <div class="welcome-message">
+        Welcome, <span id="username-display">User</span>!
+      </div>
+      <button id="logout-btn" class="logout-btn">Logout</button>
+    </section>
+    
+    <section class="upload-section">
+      <h2>Add New Media</h2>
+      <form id="upload-form">
+        <div class="form-group">
+          <label for="media-title">Title:</label>
+          <input type="text" id="media-title" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="media-file">Select image or video:</label>
+          <input type="file" id="media-file" accept="image/*,video/*" required>
+        </div>
+        
+        <button type="submit" class="btn">Add to Gallery</button>
+      </form>
+    </section>
+    
+    <section class="filter-section">
+      <div class="filter-controls">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="image">Images</button>
+        <button class="filter-btn" data-filter="video">Videos</button>
+      </div>
+    </section>
+    
+    <section class="gallery" id="media-gallery">
+      <!-- Media items will be added here dynamically -->
+      <div class="empty-gallery">
+        <p>Your gallery is empty. Add some media to get started!</p>
+      </div>
+    </section>
+  </main>
+  
+  <div id="media-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 id="modal-title"></h2>
+      <div id="modal-media-container"></div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>Caren Jepkorir </p>
+      <p>Marcellas Indeje </p>
+  </footer>
+  
+  <script src="script.js"></script>
+</body>
+</html>
+
