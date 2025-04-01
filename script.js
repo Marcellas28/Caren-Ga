@@ -23,6 +23,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // Set up event listeners
   document.getElementById("upload-form").addEventListener("submit", handleMediaUpload)
 
+  // Set up file input preview
+  document.getElementById("media-file").addEventListener("change", (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const previewElement = document.getElementById("upload-preview")
+    previewElement.innerHTML = "" // Clear placeholder
+
+    if (file.type.startsWith("image/")) {
+      const img = document.createElement("img")
+      img.src = URL.createObjectURL(file)
+      previewElement.appendChild(img)
+    } else if (file.type.startsWith("video/")) {
+      const video = document.createElement("video")
+      video.src = URL.createObjectURL(file)
+      video.controls = true
+      video.muted = true
+      previewElement.appendChild(video)
+    }
+  })
+
   // Set up filter buttons
   const filterButtons = document.querySelectorAll(".filter-btn")
   filterButtons.forEach((button) => {
@@ -133,23 +154,13 @@ function addMediaToGallery(mediaItem) {
 
   // Create media item element
   const mediaElement = document.createElement("div")
-  mediaElement.className = `media-item ${mediaItem.type}-item`
+  mediaElement.className = `media-item ${mediaItem.type}-item loading`
   mediaElement.dataset.type = mediaItem.type
   mediaElement.dataset.id = mediaItem.id
 
-  // Create preview
-  let previewElement
-  if (mediaItem.type === "image") {
-    previewElement = document.createElement("img")
-    previewElement.src = mediaItem.dataUrl
-    previewElement.alt = mediaItem.title
-  } else {
-    previewElement = document.createElement("video")
-    previewElement.src = mediaItem.dataUrl
-    previewElement.muted = true
-  }
-
-  previewElement.className = "media-preview"
+  // Create preview container (initially empty for loading state)
+  const previewContainer = document.createElement("div")
+  previewContainer.className = "media-preview"
 
   // Create info section
   const infoElement = document.createElement("div")
@@ -176,16 +187,39 @@ function addMediaToGallery(mediaItem) {
   infoElement.appendChild(typeElement)
   infoElement.appendChild(deleteButton)
 
-  mediaElement.appendChild(previewElement)
+  mediaElement.appendChild(previewContainer)
   mediaElement.appendChild(infoElement)
+
+  // Add to gallery first (to show loading state)
+  gallery.appendChild(mediaElement)
+
+  // Create and load the actual preview element
+  let previewElement
+  if (mediaItem.type === "image") {
+    previewElement = document.createElement("img")
+    previewElement.onload = () => {
+      mediaElement.classList.remove("loading")
+    }
+    previewElement.src = mediaItem.dataUrl
+    previewElement.alt = mediaItem.title
+  } else {
+    previewElement = document.createElement("video")
+    previewElement.onloadeddata = () => {
+      mediaElement.classList.remove("loading")
+    }
+    previewElement.src = mediaItem.dataUrl
+    previewElement.muted = true
+  }
+
+  previewElement.className = "media-preview"
+
+  // Replace the loading placeholder with the actual media
+  previewContainer.appendChild(previewElement)
 
   // Add click event to open modal
   mediaElement.addEventListener("click", () => {
     openMediaModal(mediaItem)
   })
-
-  // Add to gallery
-  gallery.appendChild(mediaElement)
 }
 
 // Open media modal
@@ -238,7 +272,23 @@ function deleteMediaItem(id) {
       const gallery = document.getElementById("media-gallery")
       const emptyMessage = document.createElement("div")
       emptyMessage.className = "empty-gallery"
-      emptyMessage.innerHTML = "<p>Your gallery is empty. Add some media to get started!</p>"
+      emptyMessage.innerHTML = `
+        <div class="placeholder-gallery">
+          <div class="placeholder-item">
+            <div class="placeholder-image"></div>
+            <div class="placeholder-text"></div>
+          </div>
+          <div class="placeholder-item">
+            <div class="placeholder-image"></div>
+            <div class="placeholder-text"></div>
+          </div>
+          <div class="placeholder-item">
+            <div class="placeholder-image"></div>
+            <div class="placeholder-text"></div>
+          </div>
+        </div>
+        <p>Your gallery is empty. Add some media to get started!</p>
+      `
       gallery.appendChild(emptyMessage)
     }
   }
